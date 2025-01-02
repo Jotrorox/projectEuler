@@ -3,8 +3,8 @@
 # Define language configurations
 declare -A LANGUAGE_CONFIGS=(
     # Format: [extension]="compile_command:run_command"
-    ["c"]="gcc {source} -o {output}:./{output}"
-    ["cpp"]="g++ {source} -o {output}:./{output}"
+    ["c"]="gcc {source} -o {output} {flags}:./{output}"
+    ["cpp"]="g++ {source} -o {output} {flags}:./{output}"
     ["python"]=":./{source}"
     ["py"]=":./{source}"
     ["java"]="javac {source}:java -cp {dir} Main"
@@ -17,4 +17,13 @@ declare -A FILE_PATTERNS=(
     ["python"]="main.py"
     ["py"]="main.py"
     ["java"]="Main.java"
+)
+
+# Define default compilation flags
+declare -A DEFAULT_FLAGS=(
+    ["c"]=""
+    ["cpp"]=""
+    ["python"]=""
+    ["py"]=""
+    ["java"]=""
 ) 

@@ -33,10 +33,12 @@ usage() {
     print_header
     echo -e "${BOLD}Usage:${NC} $0 <command> [arguments]"
     echo -e "\n${BOLD}Commands:${NC}"
-    echo -e "  ${YELLOW}run${NC} <problem_number> <language>  - Run a specific problem"
-    echo -e "  ${YELLOW}clear${NC}                           - Clear build directory"
-    echo -e "  ${YELLOW}list${NC} [problems|languages]       - List problems or languages"
-    echo -e "\n${BOLD}Example:${NC} $0 run 1 c"
+    echo -e "  ${YELLOW}run${NC} <problem_number> <language> [flags]  - Run a specific problem"
+    echo -e "  ${YELLOW}clear${NC}                                   - Clear build directory"
+    echo -e "  ${YELLOW}list${NC} [problems|languages]               - List problems or languages"
+    echo -e "\n${BOLD}Example:${NC}"
+    echo -e "  $0 run 1 c"
+    echo -e "  $0 run 1 c \"-lm\""
     exit 1
 }
 
@@ -69,13 +71,39 @@ clear_build() {
     print_success "Build directory cleared."
 }
 
+read_problem_config() {
+    local problem_number=$1
+    local language=$2
+    local config_file="${problem_number}/config.sh"
+    
+    # Initialize with default flags
+    local problem_flags="${DEFAULT_FLAGS[$language]}"
+    
+    # Check if config file exists and source it
+    if [ -f "$config_file" ]; then
+        # Source the config file to get COMPILE_FLAGS
+        source "$config_file"
+        if [ ! -z "${COMPILE_FLAGS[$language]}" ]; then
+            problem_flags="${COMPILE_FLAGS[$language]}"
+        fi
+    fi
+    
+    echo "$problem_flags"
+}
+
 run_problem() {
-    if [ $# -ne 2 ]; then
+    if [ $# -lt 2 ]; then
         usage
     fi
 
     problem_number=$1
     language=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+    
+    # First check for problem-specific config
+    local problem_flags=$(read_problem_config "$problem_number" "$language")
+    
+    # Command-line flags override problem-specific config
+    flags="${3:-$problem_flags}"
 
     # Check if language is supported
     if [ -z "${LANGUAGE_CONFIGS[$language]}" ]; then
@@ -106,6 +134,7 @@ run_problem() {
     compile_cmd="${compile_cmd//\{source\}/$source_file}"
     compile_cmd="${compile_cmd//\{output\}/$output_file}"
     compile_cmd="${compile_cmd//\{dir\}/$problem_build_dir}"
+    compile_cmd="${compile_cmd//\{flags\}/$flags}"
     
     run_cmd="${run_cmd//\{source\}/$source_file}"
     run_cmd="${run_cmd//\{output\}/$output_file}"
