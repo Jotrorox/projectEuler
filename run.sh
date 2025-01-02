@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 
 print_header() {
     echo -e "\n${BOLD}╔════════════════════════════════════════╗${NC}"
-    echo -e "${BOLD}║${BLUE} Project Runner                          ${BOLD}║${NC}"
+    echo -e "${BOLD}║${BLUE} Project Runner                         ${BOLD}${NC}║"
     echo -e "${BOLD}╚════════════════════════════════════════╝${NC}\n"
 }
 
