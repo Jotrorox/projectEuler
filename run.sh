@@ -45,24 +45,113 @@ usage() {
 list_languages() {
     print_header
     echo -e "${BOLD}Supported Languages:${NC}"
-    echo -e "╔════════════════╗"
-    for lang in "${!LANGUAGE_CONFIGS[@]}"; do
-        echo -e "║ • ${BLUE}$lang${NC}${spaces:${#lang}}"
+    echo -e "╔══════════════════════════════════════════════════════════╗"
+    
+    # Track total problems for statistics
+    declare -A language_counts
+    total_problems=0
+    
+    # Count problems per language
+    for problem in */; do
+        if [[ -d "$problem" && "$problem" =~ ^[0-9]+/$ ]]; then
+            ((total_problems++))
+            for lang in "${!FILE_PATTERNS[@]}"; do
+                if [ -f "${problem}${FILE_PATTERNS[$lang]}" ]; then
+                    ((language_counts[$lang]++))
+                fi
+            done
+        fi
     done
-    echo -e "╚════════════════╝"
+    
+    # Display languages and their stats
+    echo -e "║ ${BOLD}┌─ Language Statistics ─────────────────────────────────┐${NC}"
+    for lang in "${!LANGUAGE_CONFIGS[@]}"; do
+        count=${language_counts[$lang]:-0}
+        percentage=0
+        if [ $total_problems -gt 0 ]; then
+            percentage=$(( (count * 100) / total_problems ))
+        fi
+        echo -e "║ │ ${BLUE}$lang${NC}"
+        echo -e "║ │ └─ ${GREEN}$count${NC}/${total_problems} problems (${percentage}%)"
+        echo -e "║ │"
+    done
+    echo -e "║ └────────────────────────────────────────────────────────┘"
+    echo -e "╚══════════════════════════════════════════════════════════╝"
 }
 
 list_problems() {
     print_header
     echo -e "${BOLD}Available Problems:${NC}"
-    echo -e "╔════════════════╗"
-    for problem in */; do
-        if [[ -d "$problem" && "$problem" =~ ^[0-9]+/$ ]]; then
-            problem_num=${problem%/}
-            echo -e "║ • Problem ${BLUE}$problem_num${NC}"
+    echo -e "╔══════════════════════════════════════════════════════════╗"
+    
+    total_problems=0
+    total_implementations=0
+    declare -A language_totals
+    
+    # Get sorted problem list
+    problems=($(find . -maxdepth 1 -type d -name "[0-9]*" | sort -n))
+    
+    # First pass to collect statistics
+    for problem in "${problems[@]}"; do
+        if [[ -d "$problem" && "$problem" =~ ^./[0-9]+$ ]]; then
+            ((total_problems++))
+            for lang in "${!FILE_PATTERNS[@]}"; do
+                if [ -f "${problem}/${FILE_PATTERNS[$lang]}" ]; then
+                    ((total_implementations++))
+                    ((language_totals[$lang]++))
+                fi
+            done
         fi
     done
-    echo -e "╚════════════════╝"
+    
+    # Display overall statistics
+    echo -e "║ ${BOLD}┌─ Statistics ────────────────────────────────────────┐${NC}"
+    echo -e "║ │ • Total Problems: ${GREEN}$total_problems${NC}"
+    echo -e "║ │ • Total Implementations: ${GREEN}$total_implementations${NC}"
+    avg=$(( (total_implementations * 100 + total_problems / 2) / total_problems ))
+    avg_int=$((avg / 100))
+    avg_dec=$((avg % 100))
+    echo -e "║ │ • Average Implementations: ${GREEN}${avg_int}.${avg_dec}${NC} per problem"
+    echo -e "║ └────────────────────────────────────────────────────────┘"
+    echo -e "║"
+    echo -e "║ ${BOLD}┌─ Problems ──────────────────────────────────────────┐${NC}"
+    
+    # Display individual problems
+    for problem in "${problems[@]}"; do
+        if [[ -d "$problem" && "$problem" =~ ^./[0-9]+$ ]]; then
+            problem_num=${problem#./}
+            implementation_count=0
+            declare -a available_langs=()
+            
+            # Collect available languages
+            for lang in "${!FILE_PATTERNS[@]}"; do
+                if [ -f "${problem}/${FILE_PATTERNS[$lang]}" ]; then
+                    ((implementation_count++))
+                    available_langs+=("$lang")
+                fi
+            done
+            
+            # Format problem header
+            echo -e "║ │ ${BOLD}Problem ${BLUE}${problem_num}${NC}${BOLD}${NC}"
+            echo -e "║ │ ├─ ${YELLOW}$implementation_count${NC} implementation(s)"
+            
+            # Format languages with proper alignment
+            echo -ne "║ │ └─ Languages: "
+            first_lang=true
+            for lang in "${available_langs[@]}"; do
+                if [ "$first_lang" = true ]; then
+                    echo -ne "${GREEN}$lang${NC}"
+                    first_lang=false
+                else
+                    echo -ne ", ${GREEN}$lang${NC}"
+                fi
+            done
+            echo
+            echo -e "║ │"
+        fi
+    done
+    echo -e "║ └────────────────────────────────────────────────────────┘"
+    echo -e "╚══════════════════════════════════════════════════════════╝"
 }
 
 clear_build() {
