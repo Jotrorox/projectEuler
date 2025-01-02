@@ -229,23 +229,64 @@ run_problem() {
     run_cmd="${run_cmd//\{output\}/$output_file}"
     run_cmd="${run_cmd//\{dir\}/$problem_build_dir}"
 
+    # Print problem header
+    header_text=" Problem $problem_number - $language Implementation "
+    padding_length=$((58 - ${#header_text}))  # 58 is the width between ║ chars
+    right_padding=$(printf '%*s' $padding_length '')
+    
+    echo -e "\n${BOLD}╔══════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${BOLD}║${BLUE}$header_text${NC}${BOLD}${right_padding}║${NC}"
+    echo -e "${BOLD}╚══════════════════════════════════════════════════════════╝${NC}\n"
+
     # Execute commands
     if [ ! -z "$compile_cmd" ]; then
-        echo -e "\n${BOLD}[Compiling]${NC}"
-        echo -e "╔════════════════════════════════════════╗"
-        eval "$compile_cmd"
-        if [ $? -ne 0 ]; then
-            print_error "Compilation failed!"
+        echo -e "${BOLD}┌─ Compilation ────────────────────────────────────────────┐${NC}"
+        echo -e "│ Source: ${BLUE}$source_file${NC}"
+        echo -e "│ Flags:  ${YELLOW}$flags${NC}"
+        echo -e "├──────────────────────────────────────────────────────────┤"
+        echo -e "│ ${BOLD}Output:${NC}"
+        echo -e "│"
+        
+        # Capture compilation output and error
+        output=$(eval "$compile_cmd" 2>&1)
+        compile_status=$?
+        
+        if [ ! -z "$output" ]; then
+            echo -e "│ $output" | sed 's/^/│ /'
+        fi
+        
+        echo -e "│"
+        if [ $compile_status -eq 0 ]; then
+            echo -e "│ ${GREEN}✔ Compilation successful${NC}"
+        else
+            echo -e "│ ${RED}✖ Compilation failed${NC}"
+            echo -e "└──────────────────────────────────────────────────────────┘"
             exit 1
         fi
-        echo -e "╚════════════════════════════════════════╝"
-        print_success "Compilation successful"
+        echo -e "└──────────────────────────────────────────────────────────┘"
     fi
 
-    echo -e "\n${BOLD}[Running Problem $problem_number]${NC}"
-    echo -e "╔════════════════════════════════════════╗"
-    eval "$run_cmd"
-    echo -e "╚════════════════════════════════════════╝"
+    echo -e "\n${BOLD}┌─ Execution ──────────────────────────────────────────────┐${NC}"
+    echo -e "│ Command: ${BLUE}${run_cmd}${NC}"
+    echo -e "├──────────────────────────────────────────────────────────┤"
+    echo -e "│ ${BOLD}Output:${NC}"
+    echo -e "│"
+    
+    # Capture and format program output
+    output=$(eval "$run_cmd" 2>&1)
+    run_status=$?
+    
+    if [ ! -z "$output" ]; then
+        echo -e "│ $output" | sed 's/^/│ /'
+    fi
+    
+    echo -e "│"
+    if [ $run_status -eq 0 ]; then
+        echo -e "│ ${GREEN}✔ Program completed successfully${NC}"
+    else
+        echo -e "│ ${RED}✖ Program failed with exit code $run_status${NC}"
+    fi
+    echo -e "└──────────────────────────────────────────────────────────┘"
 }
 
 # Main command processing
