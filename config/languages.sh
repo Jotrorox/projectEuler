@@ -4,7 +4,7 @@
 declare -A LANGUAGE_CONFIGS=(
     # Format: [extension]="compile_command:run_command"
     ["c"]="gcc {source} -o {output} {flags}:./{output}"
-    ["java"]="javac {source}:java -cp {dir} Main"
+    ["java"]="javac -d {dir} {source}:java -cp {dir} Main"
     ["js"]=":node {source}"
 )
 
