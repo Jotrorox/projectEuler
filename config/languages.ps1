@@ -6,6 +6,7 @@ $EXE_EXT = if ($IS_WINDOWS) { ".exe" } else { "" }
 $LANGUAGE_CONFIGS = @{
     # Format: [extension]="compile_command:run_command"
     "c" = "gcc {source} -o {output}$EXE_EXT {flags}:{output}$EXE_EXT"
+    "cpp" = "g++ {source} -o {output}$EXE_EXT {flags}:{output}$EXE_EXT"
     "java" = "javac -d {dir} {source}:java -cp {dir} Main"
     "js" = ":node {source}"
     "kt" = "kotlinc {source} -d {output}.jar {flags}:kotlin -classpath {output}.jar MainKt"
@@ -17,6 +18,7 @@ $LANGUAGE_CONFIGS = @{
 # Define file name patterns
 $FILE_PATTERNS = @{
     "c" = "main.c"
+    "cpp" = "main.cpp"
     "java" = "Main.java"
     "js" = "main.js"
     "kt" = "Main.kt"
@@ -28,6 +30,7 @@ $FILE_PATTERNS = @{
 # Define default compilation flags
 $DEFAULT_FLAGS = @{
     "c" = ""
+    "cpp" = ""
     "java" = ""
     "js" = ""
     "kt" = ""
