@@ -9,9 +9,8 @@ declare -A LANGUAGE_CONFIGS=(
     ["java"]="javac -d {dir} {source}:java -cp {dir} Main"
     ["js"]=":node {source}"
     ["kt"]="kotlinc {source} -d {output}.jar {flags}:kotlin -classpath {output}.jar MainKt"
-    ["swift"]="swiftc {source} -o {output} {flags}:./{output}"
+    ["swift"]=":swift {source}"
     ["go"]="go build -o {output} {flags} {source}:./{output}"
-    ["zig"]="zig build-exe {source} -o {output} {flags}:./{output}"
     ["py"]=":python3 {source}"
 )
 
@@ -25,7 +24,6 @@ declare -A FILE_PATTERNS=(
     ["kt"]="Main.kt"
     ["swift"]="main.swift"
     ["go"]="main.go"
-    ["zig"]="main.zig"
     ["py"]="main.py"
 )
 
@@ -39,6 +37,5 @@ declare -A DEFAULT_FLAGS=(
     ["kt"]=""
     ["swift"]=""
     ["go"]=""
-    ["zig"]=""
     ["py"]=""
 )

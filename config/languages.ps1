@@ -10,9 +10,8 @@ $LANGUAGE_CONFIGS = @{
     "java" = "javac -d {dir} {source}:java -cp {dir} Main"
     "js" = ":node {source}"
     "kt" = "kotlinc {source} -d {output}.jar {flags}:kotlin -classpath {output}.jar MainKt"
-    "swift" = "swiftc {source} -o {output}$EXE_EXT {flags}:{output}$EXE_EXT"
+    "swift" = ":swift {source}"
     "go" = "go build -o {output}$EXE_EXT {flags} {source}:{output}$EXE_EXT"
-    "zig" = "zig build-exe {source} -o {output}$EXE_EXT {flags}:{output}$EXE_EXT"
     "py" = ":python3 {source}"
 }
 
@@ -25,7 +24,6 @@ $FILE_PATTERNS = @{
     "kt" = "Main.kt"
     "swift" = "main.swift"
     "go" = "main.go"
-    "zig" = "main.zig"
     "py" = "main.py"
 }
 
@@ -38,6 +36,5 @@ $DEFAULT_FLAGS = @{
     "kt" = ""
     "swift" = ""
     "go" = ""
-    "zig" = ""
     "py" = ""
-} 
+}

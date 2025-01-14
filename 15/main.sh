@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Function to compute factorial using bc
 factorial() {
     n=$1
     result=1
@@ -11,7 +10,6 @@ factorial() {
     echo $result
 }
 
-# Compute binomial coefficient C(40, 20)
 n=20
 numerator=$(factorial $((2 * n)))
 denominator=$(echo "$(factorial $n) * $(factorial $n)" | bc)
