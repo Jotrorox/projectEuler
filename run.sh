@@ -180,6 +180,17 @@ read_problem_config() {
     echo "$problem_flags"
 }
 
+copy_input_file() {
+    local problem_number=$1
+    local build_dir=$2
+    
+    local input_file="$problem_number/input.txt"
+    if [ -f "$input_file" ]; then
+        cp "$input_file" "$build_dir"
+        print_success "Copied input file to build directory"
+    fi
+}
+
 run_problem() {
     if [ $# -lt 2 ]; then
         usage
@@ -214,6 +225,9 @@ run_problem() {
     # Prepare build directory for this problem
     problem_build_dir="$BUILD_DIR/$problem_number"
     mkdir -p "$problem_build_dir"
+
+    # Copy input file if it exists
+    copy_input_file "$problem_number" "$problem_build_dir"
 
     # Get compile and run commands
     IFS=':' read -r compile_cmd run_cmd <<< "${LANGUAGE_CONFIGS[$language]}"

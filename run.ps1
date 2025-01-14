@@ -65,6 +65,19 @@ function Read-ProblemConfig {
     return $problem_flags
 }
 
+function Copy-InputFile {
+    param(
+        [string]$problem_number,
+        [string]$build_dir
+    )
+    
+    $input_file = Join-Path $problem_number "input.txt"
+    if (Test-Path $input_file) {
+        Copy-Item $input_file -Destination $build_dir
+        Print-Success "Copied input file to build directory"
+    }
+}
+
 function List-Languages {
     Print-Header
     Write-Host "${BOLD}Supported Languages:${NC}"
@@ -230,6 +243,9 @@ function Run-Problem {
     $problem_build_dir = Join-Path $BUILD_DIR $problem_number
     New-Item -ItemType Directory -Force -Path $problem_build_dir | Out-Null
 
+    # Copy input file if it exists
+    Copy-InputFile $problem_number $problem_build_dir
+
     # Get compile and run commands
     $commands = $LANGUAGE_CONFIGS[$language] -split ":"
     $compile_cmd = $commands[0]
@@ -336,4 +352,4 @@ switch ($command) {
     default {
         Show-Usage
     }
-} 
+}

@@ -12,6 +12,7 @@ declare -A LANGUAGE_CONFIGS=(
     ["swift"]="swiftc {source} -o {output} {flags}:./{output}"
     ["go"]="go build -o {output} {flags} {source}:./{output}"
     ["zig"]="zig build-exe {source} -o {output} {flags}:./{output}"
+    ["py"]=":python3 {source}"
 )
 
 # Define file name patterns
@@ -25,6 +26,7 @@ declare -A FILE_PATTERNS=(
     ["swift"]="main.swift"
     ["go"]="main.go"
     ["zig"]="main.zig"
+    ["py"]="main.py"
 )
 
 # Define default compilation flags
@@ -38,4 +40,5 @@ declare -A DEFAULT_FLAGS=(
     ["swift"]=""
     ["go"]=""
     ["zig"]=""
+    ["py"]=""
 )
