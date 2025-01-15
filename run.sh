@@ -52,11 +52,12 @@ list_languages() {
     total_problems=0
     
     # Count problems per language
-    for problem in */; do
-        if [[ -d "$problem" && "$problem" =~ ^[0-9]+/$ ]]; then
+    # Search for problem directories in the new grouped folder structure
+    for problem in $(find . -type d -regex "./[0-9]+-[0-9]+/[0-9]+" | sort -n); do
+        if [[ -d "$problem" ]]; then
             ((total_problems++))
             for lang in "${!FILE_PATTERNS[@]}"; do
-                if [ -f "${problem}${FILE_PATTERNS[$lang]}" ]; then
+                if [ -f "${problem}/${FILE_PATTERNS[$lang]}" ]; then
                     ((language_counts[$lang]++))
                 fi
             done
@@ -79,6 +80,7 @@ list_languages() {
     echo -e "╚══════════════════════════════════════════════════════════╝"
 }
 
+
 list_problems() {
     print_header
     echo -e "${BOLD}Available Problems:${NC}"
@@ -88,12 +90,12 @@ list_problems() {
     total_implementations=0
     declare -A language_totals
     
-    # Get sorted problem list
-    problems=($(find . -maxdepth 1 -type d -name "[0-9]*" | sort -n))
+    # Get sorted problem list from all grouped folders
+    problems=($(find . -type d -regex "./[0-9]+-[0-9]+/[0-9]+" | sort -n))
     
     # First pass to collect statistics
     for problem in "${problems[@]}"; do
-        if [[ -d "$problem" && "$problem" =~ ^./[0-9]+$ ]]; then
+        if [[ -d "$problem" ]]; then
             ((total_problems++))
             for lang in "${!FILE_PATTERNS[@]}"; do
                 if [ -f "${problem}/${FILE_PATTERNS[$lang]}" ]; then
@@ -118,8 +120,8 @@ list_problems() {
     
     # Display individual problems
     for problem in "${problems[@]}"; do
-        if [[ -d "$problem" && "$problem" =~ ^./[0-9]+$ ]]; then
-            problem_num=${problem#./}
+        if [[ -d "$problem" ]]; then
+            problem_num=$(basename "$problem")
             implementation_count=0
             declare -a available_langs=()
             
@@ -199,8 +201,15 @@ run_problem() {
     problem_number=$1
     language=$(echo "$2" | tr '[:upper:]' '[:lower:]')
     
+    # Locate the problem directory in the new structure
+    problem_dir=$(find . -type d -regex "./[0-9]+-[0-9]+/${problem_number}" | head -n 1)
+    if [ -z "$problem_dir" ]; then
+        print_error "Problem directory not found for problem number: $problem_number"
+        exit 1
+    fi
+
     # First check for problem-specific config
-    local problem_flags=$(read_problem_config "$problem_number" "$language")
+    local problem_flags=$(read_problem_config "$problem_dir" "$language")
     
     # Command-line flags override problem-specific config
     flags="${3:-$problem_flags}"
@@ -214,7 +223,7 @@ run_problem() {
 
     # Get file pattern for the language
     file_pattern="${FILE_PATTERNS[$language]}"
-    source_file="${problem_number}/${file_pattern}"
+    source_file="${problem_dir}/${file_pattern}"
 
     # Check if source file exists
     if [ ! -f "$source_file" ]; then
@@ -227,7 +236,7 @@ run_problem() {
     mkdir -p "$problem_build_dir"
 
     # Copy input file if it exists
-    copy_input_file "$problem_number" "$problem_build_dir"
+    copy_input_file "$problem_dir" "$problem_build_dir"
 
     # Get compile and run commands
     IFS=':' read -r compile_cmd run_cmd <<< "${LANGUAGE_CONFIGS[$language]}"
