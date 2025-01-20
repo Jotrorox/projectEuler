@@ -10,21 +10,17 @@ int main() {
     int dayOfWeek = 1;
     int sundaysOnFirst = 0;
 
-    for (int year = 1900; year < 1901; year++) {
-        for (int month = 0; month < 12; month++) {
+    for (int year = 1900; year < 1901; year++)
+        for (int month = 0; month < 12; month++)
             dayOfWeek = (dayOfWeek + daysInMonths[month] + (month == 1 && isLeapYear(year) ? 1 : 0)) % 7;
-        }
-    }
 
     for (int year = 1901; year <= 2000; year++) {
         for (int month = 0; month < 12; month++) {
-            if (dayOfWeek == 0) {
-                sundaysOnFirst++;
-            }
+            if (dayOfWeek == 0) sundaysOnFirst++;
             dayOfWeek = (dayOfWeek + daysInMonths[month] + (month == 1 && isLeapYear(year) ? 1 : 0)) % 7;
         }
     }
 
-    cout << "Number of Sundays: " << sundaysOnFirst << endl;
+    cout << sundaysOnFirst << endl;
     return 0;
 }

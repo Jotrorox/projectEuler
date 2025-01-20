@@ -31,16 +31,12 @@ int main() {
     for (int i = 0; i <= length - adjacent; i++) {
         unsigned long product = 1;
 
-        for (int j = 0; j < adjacent; j++) {
-            product *= (number[i + j] - '0');
-        }
+        for (int j = 0; j < adjacent; j++) product *= (number[i + j] - '0');
 
-        if (product > maxProduct) {
-            maxProduct = product;
-        }
+        if (product > maxProduct) maxProduct = product;
     }
 
-    printf("The greatest product of thirteen adjacent digits is: %lu\n", maxProduct);
+    printf("%lu\n", maxProduct);
 
     return 0;
 }

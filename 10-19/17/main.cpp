@@ -35,9 +35,7 @@ int countLetters(const std::string& text) {
 
 int main() {
     int totalLetters = 0;
-    for (int i = 1; i <= 1000; ++i) {
-        totalLetters += countLetters(numberToWords(i));
-    }
+    for (int i = 1; i <= 1000; ++i) totalLetters += countLetters(numberToWords(i));
     std::cout << totalLetters << std::endl;
     return 0;
 }

@@ -24,20 +24,17 @@ std::vector<std::vector<int>> readPyramid(const std::string &filename) {
 }
 
 int findMaxPathSum(std::vector<std::vector<int>> &pyramid) {
-    for (int row = pyramid.size() - 2; row >= 0; --row) {
-        for (int col = 0; col < pyramid[row].size(); ++col) {
+    for (int row = pyramid.size() - 2; row >= 0; --row)
+        for (int col = 0; col < pyramid[row].size(); ++col)
             pyramid[row][col] += std::max(pyramid[row + 1][col], pyramid[row + 1][col + 1]);
-        }
-    }
     return pyramid[0][0];
 }
 
 int main(int argc, char* argv[]) {
-    // Get the directory containing the executable
     std::filesystem::path exePath = std::filesystem::absolute(argv[0]);
     std::filesystem::path inputPath = exePath.parent_path() / "input.txt";
     
     std::vector<std::vector<int>> pyramid = readPyramid(inputPath.string());
-    std::cout << "Maximum Path Sum: " << findMaxPathSum(pyramid) << std::endl;
+    std::cout << findMaxPathSum(pyramid) << std::endl;
     return 0;
 }

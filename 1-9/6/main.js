@@ -8,4 +8,4 @@ for (let i = 1; i <= 100; i++) {
 
 square_of_sum *= square_of_sum;
 
-console.log("The difference between the sum of the squares of the first one hundred natural numbers and the square of the sum is: " + (square_of_sum - sum_of_squares));
+console.log(square_of_sum - sum_of_squares);

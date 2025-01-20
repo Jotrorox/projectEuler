@@ -25,6 +25,6 @@ int main() {
         }
     }
 
-    printf("Number %d has length %d\n", answer, max_length);
+    printf("%d\n", max_length);
     return 0;
 }

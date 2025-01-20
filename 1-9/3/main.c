@@ -31,9 +31,7 @@ int main() {
     int size;
     long* factors = primeFactors(n, &size);
 
-    if (size > 0) {
-        printf("Largest prime factor of %ld is: %ld\n", n, factors[size - 1]);
-    }
+    if (size > 0) printf("%ld\n", factors[size - 1]);
 
     free(factors);
     return 0;

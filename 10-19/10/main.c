@@ -39,6 +39,6 @@ unsigned long long sum_of_primes_below_limit(int limit) {
 int main() {
     int max = 2000000;
     unsigned long long result = sum_of_primes_below_limit(max);
-    printf("The sum of all primes below %d is %llu\n", max, result);
+    printf("%llu\n", result);
     return 0;
 }

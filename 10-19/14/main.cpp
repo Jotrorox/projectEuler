@@ -26,6 +26,6 @@ int main() {
         }
     }
 
-    cout << "Number " << answer << " has length " << maxLength << endl;
+    cout << maxLength << endl;
     return 0;
 }

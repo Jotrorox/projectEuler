@@ -5,25 +5,20 @@
 
 using namespace std;
 
-// Function to add two large numbers stored as strings
 string addLargeNumbers(string num1, string num2) {
-    // Make the lengths equal by padding with zeros
     while (num1.length() < num2.length()) num1 = "0" + num1;
     while (num2.length() < num1.length()) num2 = "0" + num2;
     
     string result;
     int carry = 0;
     
-    // Add digits from right to left
     for (int i = num1.length() - 1; i >= 0; i--) {
         int sum = (num1[i] - '0') + (num2[i] - '0') + carry;
         carry = sum / 10;
         result = to_string(sum % 10) + result;
     }
     
-    if (carry > 0) {
-        result = to_string(carry) + result;
-    }
+    if (carry > 0) result = to_string(carry) + result;
     
     return result;
 }
@@ -133,12 +128,9 @@ int main() {
     };
     
     string sum = "0";
-    for (const string& num : numbers) {
-        sum = addLargeNumbers(sum, num);
-    }
+    for (const string& num : numbers) sum = addLargeNumbers(sum, num);
     
-    // Print first 10 digits
-    cout << "First 10 digits: " << sum.substr(0, 10) << endl;
+    cout << sum.substr(0, 10) << endl;
     
     return 0;
 }

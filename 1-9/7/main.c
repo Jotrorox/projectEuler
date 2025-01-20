@@ -10,19 +10,15 @@ int main() {
 
     while (count < target) {
         number++;
-        if (is_prime(number)) {
-            count++;
-        }
+        if (is_prime(number)) count++;
     }
 
-    printf("The 10,001st prime number is: %d\n", number);
+    printf("%d\n", number);
     return 0;
 }
 
 bool is_prime(int n) {
     if (n < 2) return false;
-    for (int i = 2; i * i <= n; i++) {
-        if (n % i == 0) return false;
-    }
+    for (int i = 2; i * i <= n; i++) if (n % i == 0) return false;
     return true;
 }

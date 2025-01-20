@@ -17,4 +17,4 @@ function findMaxPathSum(pyramid) {
 
 const filename = path.resolve(__dirname, 'input.txt');
 const pyramid = readPyramid(filename);
-console.log('Maximum Path Sum:', findMaxPathSum(pyramid));
+console.log(findMaxPathSum(pyramid));
