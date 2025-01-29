@@ -28,5 +28,5 @@ func main() {
 			}
 		}
 	}
-	fmt.Println("Maximum digital sum:", maxSum)
+	fmt.Println(maxSum)
 }
