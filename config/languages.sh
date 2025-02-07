@@ -12,6 +12,7 @@ declare -A LANGUAGE_CONFIGS=(
     ["swift"]=":swift {source}"
     ["go"]="go build -o {output} {flags} {source}:./{output}"
     ["py"]=":python3 {source}"
+    ["pl"]=":perl {source}"
 )
 
 # Define file name patterns
@@ -25,6 +26,7 @@ declare -A FILE_PATTERNS=(
     ["swift"]="main.swift"
     ["go"]="main.go"
     ["py"]="main.py"
+    ["pl"]="main.pl"
 )
 
 # Define default compilation flags
@@ -38,4 +40,5 @@ declare -A DEFAULT_FLAGS=(
     ["swift"]=""
     ["go"]=""
     ["py"]=""
+    ["pl"]=""
 )
