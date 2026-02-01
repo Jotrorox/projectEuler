@@ -1,19 +1,16 @@
 #!/bin/bash
 
-# Source the language configurations
 source "$(dirname "$0")/config/languages.sh"
 
-# Create build directory if it doesn't exist
 BUILD_DIR="build"
 mkdir -p "$BUILD_DIR"
 
-# ASCII styling
 BOLD='\033[1m'
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 print_header() {
     echo -e "\n${BOLD}╔════════════════════════════════════════╗${NC}"
@@ -47,12 +44,9 @@ list_languages() {
     echo -e "${BOLD}Supported Languages:${NC}"
     echo -e "╔══════════════════════════════════════════════════════════╗"
     
-    # Track total problems for statistics
     declare -A language_counts
     total_problems=0
     
-    # Count problems per language
-    # Search for problem directories in the new grouped folder structure
     for problem in $(find . -type d -regex "./[0-9]+-[0-9]+/[0-9]+" | sort -n); do
         if [[ -d "$problem" ]]; then
             ((total_problems++))
@@ -64,7 +58,6 @@ list_languages() {
         fi
     done
     
-    # Display languages and their stats
     echo -e "║ ${BOLD}┌─ Language Statistics ─────────────────────────────────┐${NC}"
     for lang in "${!LANGUAGE_CONFIGS[@]}"; do
         count=${language_counts[$lang]:-0}
@@ -90,10 +83,8 @@ list_problems() {
     total_implementations=0
     declare -A language_totals
     
-    # Get sorted problem list from all grouped folders
     problems=($(find . -type d -regex "./[0-9]+-[0-9]+/[0-9]+" | sort -n))
     
-    # First pass to collect statistics
     for problem in "${problems[@]}"; do
         if [[ -d "$problem" ]]; then
             ((total_problems++))
@@ -106,7 +97,6 @@ list_problems() {
         fi
     done
     
-    # Display overall statistics
     echo -e "║ ${BOLD}┌─ Statistics ────────────────────────────────────────┐${NC}"
     echo -e "║ │ • Total Problems: ${GREEN}$total_problems${NC}"
     echo -e "║ │ • Total Implementations: ${GREEN}$total_implementations${NC}"
@@ -118,14 +108,12 @@ list_problems() {
     echo -e "║"
     echo -e "║ ${BOLD}┌─ Problems ──────────────────────────────────────────┐${NC}"
     
-    # Display individual problems
     for problem in "${problems[@]}"; do
         if [[ -d "$problem" ]]; then
             problem_num=$(basename "$problem")
             implementation_count=0
             declare -a available_langs=()
             
-            # Collect available languages
             for lang in "${!FILE_PATTERNS[@]}"; do
                 if [ -f "${problem}/${FILE_PATTERNS[$lang]}" ]; then
                     ((implementation_count++))
@@ -133,11 +121,9 @@ list_problems() {
                 fi
             done
             
-            # Format problem header
             echo -e "║ │ ${BOLD}Problem ${BLUE}${problem_num}${NC}${BOLD}${NC}"
             echo -e "║ │ ├─ ${YELLOW}$implementation_count${NC} implementation(s)"
             
-            # Format languages with proper alignment
             echo -ne "║ │ └─ Languages: "
             first_lang=true
             for lang in "${available_langs[@]}"; do
@@ -167,12 +153,9 @@ read_problem_config() {
     local language=$2
     local config_file="${problem_number}/config.sh"
     
-    # Initialize with default flags
     local problem_flags="${DEFAULT_FLAGS[$language]}"
     
-    # Check if config file exists and source it
     if [ -f "$config_file" ]; then
-        # Source the config file to get COMPILE_FLAGS
         source "$config_file"
         if [ ! -z "${COMPILE_FLAGS[$language]}" ]; then
             problem_flags="${COMPILE_FLAGS[$language]}"
@@ -201,47 +184,37 @@ run_problem() {
     problem_number=$1
     language=$(echo "$2" | tr '[:upper:]' '[:lower:]')
     
-    # Locate the problem directory in the new structure
     problem_dir=$(find . -type d -regex "./[0-9]+-[0-9]+/${problem_number}" | head -n 1)
     if [ -z "$problem_dir" ]; then
         print_error "Problem directory not found for problem number: $problem_number"
         exit 1
     fi
 
-    # First check for problem-specific config
     local problem_flags=$(read_problem_config "$problem_dir" "$language")
     
-    # Command-line flags override problem-specific config
     flags="${3:-$problem_flags}"
 
-    # Check if language is supported
     if [ -z "${LANGUAGE_CONFIGS[$language]}" ]; then
         print_error "Unsupported language: $language"
         echo -e "Use '${YELLOW}$0 list languages${NC}' to see supported languages"
         exit 1
     fi
 
-    # Get file pattern for the language
     file_pattern="${FILE_PATTERNS[$language]}"
     source_file="${problem_dir}/${file_pattern}"
 
-    # Check if source file exists
     if [ ! -f "$source_file" ]; then
         print_error "Source file not found: $source_file"
         exit 1
     fi
 
-    # Prepare build directory for this problem
     problem_build_dir="$BUILD_DIR/$problem_number"
     mkdir -p "$problem_build_dir"
 
-    # Copy input file if it exists
     copy_input_file "$problem_dir" "$problem_build_dir"
 
-    # Get compile and run commands
     IFS=':' read -r compile_cmd run_cmd <<< "${LANGUAGE_CONFIGS[$language]}"
     
-    # Replace placeholders in commands
     output_file="$problem_build_dir/program"
     compile_cmd="${compile_cmd//\{source\}/$source_file}"
     compile_cmd="${compile_cmd//\{output\}/$output_file}"
@@ -252,16 +225,14 @@ run_problem() {
     run_cmd="${run_cmd//\{output\}/$output_file}"
     run_cmd="${run_cmd//\{dir\}/$problem_build_dir}"
 
-    # Print problem header
     header_text=" Problem $problem_number - $language Implementation "
-    padding_length=$((58 - ${#header_text}))  # 58 is the width between ║ chars
+    padding_length=$((58 - ${#header_text}))
     right_padding=$(printf '%*s' $padding_length '')
     
     echo -e "\n${BOLD}╔══════════════════════════════════════════════════════════╗${NC}"
     echo -e "${BOLD}║${BLUE}$header_text${NC}${BOLD}${right_padding}║${NC}"
     echo -e "${BOLD}╚══════════════════════════════════════════════════════════╝${NC}\n"
 
-    # Execute commands
     if [ ! -z "$compile_cmd" ]; then
         echo -e "${BOLD}┌─ Compilation ────────────────────────────────────────────┐${NC}"
         echo -e "│ Source: ${BLUE}$source_file${NC}"
@@ -270,7 +241,6 @@ run_problem() {
         echo -e "│ ${BOLD}Output:${NC}"
         echo -e "│"
         
-        # Capture compilation output and error
         output=$(eval "$compile_cmd" 2>&1)
         compile_status=$?
         
@@ -295,7 +265,6 @@ run_problem() {
     echo -e "│ ${BOLD}Output:${NC}"
     echo -e "│"
     
-    # Capture and format program output
     output=$(eval "$run_cmd" 2>&1)
     run_status=$?
     
@@ -312,7 +281,6 @@ run_problem() {
     echo -e "└──────────────────────────────────────────────────────────┘"
 }
 
-# Main command processing
 case $1 in
     "run")
         shift

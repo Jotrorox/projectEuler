@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Define language configurations
 declare -A LANGUAGE_CONFIGS=(
     # Format: [extension]="compile_command:run_command"
     ["c"]="gcc {source} -o {output} {flags}:./{output}"
@@ -16,7 +15,6 @@ declare -A LANGUAGE_CONFIGS=(
     ["ha"]=":hare run {source}"
 )
 
-# Define file name patterns
 declare -A FILE_PATTERNS=(
     ["c"]="main.c"
     ["cpp"]="main.cpp"
@@ -31,7 +29,6 @@ declare -A FILE_PATTERNS=(
     ["ha"]="main.ha"
 )
 
-# Define default compilation flags
 declare -A DEFAULT_FLAGS=(
     ["c"]=""
     ["cpp"]=""
